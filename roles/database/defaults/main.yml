@@ -1,0 +1,11 @@
+---
+# defaults file for database
+
+mongodb:
+  dbpath: /var/lib/mongo
+
+db_admin_user: "superadmin"
+db_admin_pass: "MyPass1234"
+db_name_todo: test
+db_todo_user: todo
+db_todo_pass: todo

@@ -1,0 +1,12 @@
+app ansible_host=
+db ansible_host=
+
+[todo]
+app
+db
+
+
+[todo:vars]
+ansible_ssh_user=root
+ansible_ssh_pass=
+

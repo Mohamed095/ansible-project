@@ -1,0 +1,6 @@
+- name: play database
+  hosts: db
+  remote_user: root
+  gather_facts: yes
+  roles:
+    - database

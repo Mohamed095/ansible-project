@@ -1,0 +1,77 @@
+---
+# tasks file for database
+
+- name: add 10gen repo file
+  template: 
+    src: repo.j2 
+    dest: /etc/yum.repos.d/mongo.repo
+  tags: mongodb
+
+- name: install mongodb
+  yum:  
+    name: mongodb-org
+    state: present
+  tags: mongodb
+
+- name: configure mongodb
+  template: 
+    src: mongod.conf.j2 
+    dest: /etc/mongod.conf
+  tags: mongodb
+
+- name: run mongodb
+  service: 
+    name: mongod 
+    state: started 
+    enabled: yes
+  tags: mongodb
+
+- name: configure admin user
+  command: "{{ item }}"
+  loop:
+  - mongo admin --eval 'db.dropUser("{{ db_admin_user }}")'
+  - |
+    mongo admin --eval 'db.createUser( { user: "{{ db_admin_user }}", pwd: "{{ db_admin_pass }}", roles: [ { role: "clusterAdmin", db: "admin" }, { role: "userAdminAnyDatabase", db: "admin" } ] } )'
+  tags: db-config-admin
+
+- name: security is enabled
+  blockinfile:
+    path: /etc/mongod.conf
+    block: |
+      security:
+        authorization: "enabled"
+    state: present
+  notify: mongodb is restarted
+  tags: db-config-admin
+
+- name: pip2 installed
+  package:
+    name: python2-pip
+    state: latest
+  tags: db_config
+
+- name: pip pymongo installed
+  pip:
+    name: pymongo
+    state: latest
+  tags: db_config
+- name: todo db user exsits
+  mongodb_user:
+    login_user: "{{ db_admin_user }}"
+    login_password: "{{ db_admin_pass }}"
+    database: admin
+    user: "{{ db_todo_user }}"
+    password: "{{ db_todo_pass }}"
+    state: present
+    roles:
+      - db: "{{ db_name_todo }}"
+        role: readWrite
+  tags: db_config
+- name: db accepts connection from anywhere
+  lineinfile:
+    path: /etc/mongod.conf
+    line: "  bindIp: 0.0.0.0"
+    regexp: '^(.*)bindIp(.*)$'
+    state: present
+  notify: mongodb is restarted
+  tags: db_config

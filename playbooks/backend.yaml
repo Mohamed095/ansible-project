@@ -1,0 +1,4 @@
+- name: play backend
+  hosts: app
+  gather_facts: yes
+  tasks: []
