@@ -1,1 +1,6 @@
-[]
+- src: abdennour.golang
+  version: v1.0.12
+  name: abdennour.golang
+
+- src: geerlingguy.nodejs
+  name: geerlingguy.nodejs
